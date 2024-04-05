@@ -1,3 +1,4 @@
+console.log("opening")
 const fs = require('fs');
 const express = require('express');
 var app = express();
@@ -24,17 +25,3 @@ function joinGame(e, socket){
     console.log(e, socket.id);
     console.log(e, socket)
 };
-
-
-////////////////////////////////////////////////////////////////////
-class REGION{
-constructor(e){
-    this.army="ayo"
-    this.size=e
-}
-explode(a){
-    this.size = this.size - a
-}
-}
-
-hongkong=new REGION(100)
