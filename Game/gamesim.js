@@ -3,7 +3,7 @@ class REGION{
         this.regionID = regionID; //8 bit binary number, stores unique region id
         this.controlScore = controlScore; //5 bit binary number, stores info on the control state of the region (controlled, contested, in battle, etc)
         this.resourceType = resourceType; //2 bit binary number, stores the resource present in region
-        this.isCity = isCity; //2 bit binary number, stores whether or not the region has an extra resource
+        this.isCity = isCity; //2 bit binary number, stores whether or not the region has a city
     };
     invade(controlScoreChange){
         this.controlScore = controlScoreChange; //5 bit binary number, updates the control score after an event
@@ -26,6 +26,6 @@ class UNITS{
         this.type = type; //2 bit binary number, stores the type of unit
         this.level = level; //5 bit binary number, stores the level of unit
         this.location = location; //8 bit binary number, stores the region id of location
-    }
+    };
 };
 
