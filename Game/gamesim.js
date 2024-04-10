@@ -1,27 +1,32 @@
 class REGION{
-    constructor(regionID, controlScore, resourceType, isCity){
-        this.regionID = regionID; //8 bit binary number, stores unique region id
-        this.controlScore = controlScore; //5 bit binary number, stores info on the control state of the region (controlled, contested, in battle, etc)
+    constructor(controlScores, resourceType, isCity){
+        this.regionID = (0o1); //8 bit binary number, stores unique region id
+        this.controlScores = controlScores; //Dict of 3 bit binary numbers for each nation, stores info on the control state of the region (controlled, contested, in battle, etc)
         this.resourceType = resourceType; //2 bit binary number, stores the resource present in region
         this.isCity = isCity; //2 bit binary number, stores whether or not the region has a city
     };
+    
     invade(controlScoreChange){
         this.controlScore = controlScoreChange; //5 bit binary number, updates the control score after an event
     };
 };
 
 class NATION{
-    constructor(nationID, color, regionControl, militaryUnits){
-        this.nationID = nationID; //4 bit binary number, stores unique nation id
+    constructor(color){
+        this.nationID = (0o0); //4 bit binary number, stores unique nation id
         this.color = color; //4 bit binary number, stores unique color id
-        this.regionControl = regionControl; // not sure how to do this, list of ids?
-        this.militaryUnits = militaryUnits; // not sure how to do this, list of ids?
+        this.units = {}
+    };
+
+    createUnit(type, level, location){
+        let unit = new UNITS(this.nationID, type, level, location);
+        this.units[unit.unitID] += unit;
     };
 };
 
 class UNITS{
-    constructor(unitID, owner, type, level, location){
-        this.unitID = unitID; //10 bit binary number, stores unique unit id
+    constructor(owner, type, level, location){
+        this.unitID = (0o0); //10 bit binary number, stores unique unit id
         this.owner = owner; //4 bit binary number, stores the nation id of owner
         this.type = type; //2 bit binary number, stores the type of unit
         this.level = level; //5 bit binary number, stores the level of unit
@@ -29,3 +34,10 @@ class UNITS{
     };
 };
 
+
+let Japan = new NATION((0o0))
+Japan.createUnit((0o0), (0o11), (0o0))
+let dict = {}
+dict[Japan.nationID] = 1
+let Shanghai = new REGION((dict), (0o1), (0o0))
+console.log(Shanghai.controlScores)
