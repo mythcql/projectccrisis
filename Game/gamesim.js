@@ -7,7 +7,7 @@ class REGION{
     };
     
     invade(controlScoreChange){
-        this.controlScore = controlScoreChange; //5 bit binary number, updates the control score after an event
+        this.controlScores = controlScoreChange; //5 bit binary number, updates the control score after an event
     };
 };
 
@@ -35,9 +35,9 @@ class UNITS{
 };
 
 
-let Japan = new NATION((0o0))
-Japan.createUnit((0o0), (0o11), (0o0))
+let Japan = new NATION(("red"))
+Japan.createUnit(("infantry"), (3), ("Shanghai"))
 let dict = {}
 dict[Japan.nationID] = 1
-let Shanghai = new REGION((dict), (0o1), (0o0))
+let Shanghai = new REGION((dict), ("farm"), (false))
 console.log(Shanghai.controlScores)
