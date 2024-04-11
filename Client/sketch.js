@@ -11,8 +11,9 @@ myCanvas.height = Height
 HeightM = Height/2
 myCanvas.style.position = "absolute"
 
-//document.addEventListener
-
 const socket = io.connect('/')
 let info = "yum"
 socket.emit("JOINGAME", info)
+
+socket.emit("GETINFO", Shanghai.controlScores)
+socket.on("SENDINFO", (e)=>{console.log(e)})
