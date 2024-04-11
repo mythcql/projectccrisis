@@ -14,6 +14,6 @@ myCanvas.style.position = "absolute"
 const socket = io.connect('/')
 let info = "yum"
 socket.emit("JOINGAME", info)
+socket.emit("GETINFO", "Shanghai", "controlScores");
 
-socket.emit("GETINFO", Shanghai.controlScores)
-socket.on("SENDINFO", (e)=>{console.log(e)})
+socket.on("SENDINFO", (gotInfo=>{console.log(gotInfo)}));

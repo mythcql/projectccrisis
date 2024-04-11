@@ -5,7 +5,7 @@ var app = express();
 server = app.listen(3333);
 var socket = require('socket.io');
 var io = socket(server);
-app.use(express.static('Client'));
+app.use(express.static('client'));
 app.use(express.json());
 app.post('/responder', (req, res) => {
     console.log('Got body:', req.body);
@@ -70,12 +70,14 @@ Japan.createUnit(("infantry"), (3), ("Shanghai"))
 let dict = {}
 dict[Japan.nationID] = 1
 let Shanghai = new REGION((dict), ("farm"), (false))
-console.log(Shanghai.controlScores)
 
 /////
 
-function getInfo(e) {
-    info=e
+function getInfo(name, variable){
+    console.log("fklajsf")
+    info = (name + "." + variable)
+    console.log(name + "." + variable)
+    console.log(info)
     io.to(socket.id).emit("SENDINFO", info)
 }
-io.sockets.on("GETINFO", getInfo)
+io.sockets.on("GETINFO", (name, variable)=>getInfo(name, variable))
