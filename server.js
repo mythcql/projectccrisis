@@ -16,7 +16,7 @@ console.log("Server has opened: "+Date.now());
 io.sockets.on('connection', newConnection);
 
 function newConnection(socket){
-	socket.on("JOINGAME",(e)=>{joinGame(e,socket)}); //runs the join game function
+	socket.on("JOINGAME",(e)=>{joinGame(e, socket)}); //runs the join game function
     //io.socket.on is recieving info from client
     //io.to(socket.id).emit is sending info to a client
 };
