@@ -14,11 +14,14 @@ app.post('/responder', (req, res) => {
 console.log("Server has opened: "+Date.now());
 
 io.sockets.on('connection', newConnection);
+// io.sockets.on("GETINFO", (variable)=>{console.log("gay")})
+// io.sockets.on("GETINFO", (variable)=>{getInfo(variable,socket)})
 
 function newConnection(socket){
-	socket.on("JOINGAME",(e)=>{joinGame(e, socket)}); //runs the join game function
+	socket.on("JOINGAME",(e)=>{joinGame(e,socket)}); //runs the join game function
     //io.socket.on is recieving info from client
     //io.to(socket.id).emit is sending info to a client
+    socket.on("GETINFO", (variable)=>{getInfo(variable,socket)})
 };
 
 function joinGame(e, socket){
@@ -72,12 +75,8 @@ dict[Japan.nationID] = 1
 let Shanghai = new REGION((dict), ("farm"), (false))
 
 /////
-
-function getInfo(name, variable){
-    console.log("fklajsf")
-    info = (name + "." + variable)
-    console.log(name + "." + variable)
+const thingie = ["a","b","c"]
+function getInfo(info, socket){
     console.log(info)
-    io.to(socket.id).emit("SENDINFO", info)
+    io.to(socket.id).emit("SENDINFO", thingie[info])
 }
-io.sockets.on("GETINFO", (name, variable)=>getInfo(name, variable))
