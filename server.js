@@ -28,9 +28,22 @@ function joinGame(e, socket){
     console.log(e, socket.id);
 };
 
+//////////////////
+//put the savefile loader thing here
+///////////////////////////////////////////////////
+class WORLD{
+    constructor(saveFile){
+        this.saveFile = saveFile;
+        this.worldID = 0o0;
+    };
+    createNation(name, color){
+        let (name) = new NATION(color);
+    };
+    createRegion(name, controlScores, resourceType, isCity){
+        let (name) = new REGION(controlScores, resourceType, isCity);
+    };
+}
 
-
-////////gamesim testing///////////////////
 class REGION{
     constructor(controlScores, resourceType, isCity){
         this.regionID = (0o1); //8 bit binary number, stores unique region id
@@ -48,7 +61,7 @@ class NATION{
     constructor(color){
         this.nationID = (0o0); //4 bit binary number, stores unique nation id
         this.color = color; //4 bit binary number, stores unique color id
-        this.units = {}
+        this.units = {};
     };
 
     createUnit(type, level, location){
@@ -67,16 +80,8 @@ class UNITS{
     };
 };
 
-
-let Japan = new NATION(("red"))
-Japan.createUnit(("infantry"), (3), ("Shanghai"))
-let dict = {}
-dict[Japan.nationID] = 1
-let Shanghai = new REGION((dict), ("farm"), (false))
-
-/////
-const thingie = ["a","b","c"]
-function getInfo(info, socket){
-    console.log(info)
-    io.to(socket.id).emit("SENDINFO", thingie[info])
-}
+////
+let SJW2 = new WORLD(HJCC2ndSinoJapWarV1.json);
+SJW2.createNation(China, "yellow");
+SJW2.createNation(Japan, "red");
+SJW2.createRegion(JapanIsl, {China:1, Japan:5}, "farm", true)
