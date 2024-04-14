@@ -37,14 +37,15 @@ class WORLD{
         this.worldID = 0o0;
         this.nations = {};
         this.regions = {};
+        this.idToName = {};
     };
-    createNation(nation, color){
-        let (naiton) = new NATION(color);
-        this.nations[nation. nationID] = nation;
+    createNation(nationID, color){
+        let nation = new NATION(nationID, color);
+        this.nations[nationID] = nation;
     };
-    createRegion(region, controlScores, resourceType, isCity){
-        let (region) = new REGION(controlScores, resourceType, isCity);
-        this.regions[region.regionID] = region;
+    createRegion(regionID, controlScores, resourceType, isCity){
+        let region = new REGION(regionID, controlScores, resourceType, isCity);
+        this.regions[regionID] = region;
     };
 }
 
@@ -68,13 +69,13 @@ class NATION{
         this.units = {};
     };
 
-    createUnit(type, level, location){
+    createUnit( type, level, location){
         let unit = new UNITS(this.nationID, type, level, location);
-        this.units[unit.unitID] = unit;
+        this.units[unitID] = unit;
     };
 };
 
-class UNITS{
+class UNIT{
     constructor(unitID, owner, type, level, location){
         this.unitID = unitID; //10 bit binary number, stores unique unit id
         this.owner = owner; //4 bit binary number, stores the nation id of owner
@@ -85,14 +86,14 @@ class UNITS{
 };
 
 ////
-let SJW2 = new WORLD(HJCC2ndSinoJapWarV1.json);
-SJW2.createNation(0o0, China, "yellow");
-SJW2.createNation(0o1, Japan, "red");
-SJW2.createRegion(0o0, JapanIsl, {China:1, Japan:5}, "factory", true)
-SJW2.createRegion(0o1, KoreaPen, {China:1, Japan:5}, "farm", true)
-SJW2.createRegion(0o10, Manchuria, {China:1, Japan:5}, "farm", false)
-SJW2.createRegion(0o11, NorthChina, {China:2, Japan:4}, "factory", false)
-SJW2.createRegion(0o100, WestChina, {China:3, Japan:3}, "factory", true)
-SJW2.createRegion(0o101, SouthChina, {China:4, Japan:2}, "farm", true)
-SJW2.createRegion(0o110, EastChina, {China:5, Japan:1}, "factory", false)
-SJW2.createRegion(0o111, IndoChina, {China:3, Japan:3}, "farm", false)
+let SJW2 = new WORLD("HJCC2ndSinoJapWarV1.json");
+SJW2.createNation("China", "yellow");
+SJW2.createNation("Japan", "red");
+SJW2.createRegion("JapanIsl", {"China":1, "Japan":5}, "factory", true)
+SJW2.createRegion("KoreaPen", {"China":1, "Japan":5}, "farm", true)
+SJW2.createRegion("Manchuria", {"China":1, "Japan":5}, "farm", false)
+SJW2.createRegion("NorthChina", {"China":2, "Japan":4}, "factory", false)
+SJW2.createRegion("WestChina", {"China":3, "Japan":3}, "factory", true)
+SJW2.createRegion("SouthChina", {"China":4, "Japan":2}, "farm", true)
+SJW2.createRegion("EastChina", {"China":5, "Japan":1}, "factory", false)
+SJW2.createRegion("IndoChina", {"China":3, "Japan":3}, "farm", false)
