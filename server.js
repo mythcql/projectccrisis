@@ -1,4 +1,4 @@
-console.log("opening")
+console.log("opening");
 const fs = require('fs');
 const express = require('express');
 var app = express();
@@ -31,6 +31,34 @@ function joinGame(e, socket){
 //////////////////
 //put the savefile loader thing here
 ///////////////////////////////////////////////////
+
+////////////color lightener/darkener/////////////////////
+const pSBC=(p,c0,c1,l)=>{
+    let r,g,b,P,f,t,h,i=parseInt,m=Math.round,a=typeof(c1)=="string";
+    if(typeof(p)!="number"||p<-1||p>1||typeof(c0)!="string"||(c0[0]!='r'&&c0[0]!='#')||(c1&&!a))return null;
+    if(!this.pSBCr)this.pSBCr=(d)=>{
+        let n=d.length,x={};
+        if(n>9){
+            [r,g,b,a]=d=d.split(","),n=d.length;
+            if(n<3||n>4)return null;
+            x.r=i(r[3]=="a"?r.slice(5):r.slice(4)),x.g=i(g),x.b=i(b),x.a=a?parseFloat(a):-1
+        }else{
+            if(n==8||n==6||n<4)return null;
+            if(n<6)d="#"+d[1]+d[1]+d[2]+d[2]+d[3]+d[3]+(n>4?d[4]+d[4]:"");
+            d=i(d.slice(1),16);
+            if(n==9||n==5)x.r=d>>24&255,x.g=d>>16&255,x.b=d>>8&255,x.a=m((d&255)/0.255)/1000;
+            else x.r=d>>16,x.g=d>>8&255,x.b=d&255,x.a=-1
+        }return x};
+    h=c0.length>9,h=a?c1.length>9?true:c1=="c"?!h:false:h,f=this.pSBCr(c0),P=p<0,t=c1&&c1!="c"?this.pSBCr(c1):P?{r:0,g:0,b:0,a:-1}:{r:255,g:255,b:255,a:-1},p=P?p*-1:p,P=1-p;
+    if(!f||!t)return null;
+    if(l)r=m(P*f.r+p*t.r),g=m(P*f.g+p*t.g),b=m(P*f.b+p*t.b);
+    else r=m((P*f.r**2+p*t.r**2)**0.5),g=m((P*f.g**2+p*t.g**2)**0.5),b=m((P*f.b**2+p*t.b**2)**0.5);
+    a=f.a,t=t.a,f=a>=0||t>=0,a=f?a<0?t:t<0?a:a*P+t*p:0;
+    if(h)return"rgb"+(f?"a(":"(")+r+","+g+","+b+(f?","+m(a*1000)/1000:"")+")";
+    else return"#"+(4294967296+r*16777216+g*65536+b*256+(f?m(a*255):0)).toString(16).slice(1,f?undefined:-2)
+}
+///////////////////////////////////////
+
 class WORLD{
     constructor(saveFile){
         this.saveFile = saveFile;
@@ -38,6 +66,7 @@ class WORLD{
         this.nations = {};
         this.regions = {};
         this.idToName = {};
+        this.worldTiles = {}
     };
     createNation(nationID, color){
         let nation = new NATION(nationID, color);
@@ -51,21 +80,25 @@ class WORLD{
 
 class REGION{
     constructor(regionID, controlScores, resourceType, isCity){
-        this.regionID = regionID; //8 bit binary number, stores unique region id
-        this.controlScores = controlScores; //Dict of 3 bit binary numbers for each nation, stores info on the control state of the region (controlled, contested, in battle, etc)
-        this.resourceType = resourceType; //2 bit binary number, stores the resource present in region
-        this.isCity = isCity; //2 bit binary number, stores whether or not the region has a city
+        this.regionID = regionID; //stores unique region id
+        this.controlScores = controlScores; //stores info on the control state of the region (controlled, contested, in battle, etc)
+        this.resourceType = resourceType; //stores the resource present in region
+        this.isCity = isCity; //stores whether or not the region has a city
+        this.regionTiles = [];
     };
-    
-    invade(controlScoreChange){
-        this.controlScores = controlScoreChange; //5 bit binary number, updates the control score after an event
+
+    addTileToRegion(x,y){
+
     };
 };
 
+
 class NATION{
     constructor(nationID, color){
-        this.nationID = nationID; //4 bit binary number, stores unique nation id
-        this.color = color; //4 bit binary number, stores unique color id
+        this.nationID = nationID; //stores unique nation id
+        this.colorCtrl5 = color; //stores default color
+        this.colorCtrl4 = pSBC(0.3, this.colorCtrl5); 
+        this.colorCtrl6 = pSBC(-0.3, this.colorCtrl5);
         this.units = {};
     };
 
@@ -87,8 +120,8 @@ class UNIT{
 
 ////
 let SJW2 = new WORLD("HJCC2ndSinoJapWarV1.json");
-SJW2.createNation("China", "yellow");
-SJW2.createNation("Japan", "red");
+SJW2.createNation("China", "#2c358a");
+SJW2.createNation("Japan", "#cf1717");
 SJW2.createRegion("JapanIsl", {"China":1, "Japan":5}, "factory", true)
 SJW2.createRegion("KoreaPen", {"China":1, "Japan":5}, "farm", true)
 SJW2.createRegion("Manchuria", {"China":1, "Japan":5}, "farm", false)

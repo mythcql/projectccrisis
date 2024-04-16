@@ -17,3 +17,23 @@ socket.emit("JOINGAME", info)
 
 socket.on("SENDINFO", (gotInfo)=>{console.log(gotInfo)});
 socket.emit("GETINFO", Shanghai.controlScores);
+
+////////////////////////////////////////////////////////
+//world.worldTiles
+//world.regions
+//
+let zoomFactor = 1;
+let regionTileSize = 30*zoomFactor;
+let mouseTile= [0,0];
+let mouseRegion;
+
+function draw(){
+    mouseTile = [Math.floor(mouseX/regionTileSize),Math.floor(mouseY/regionTileSize)];
+    mouseRegion = world.worldTiles[mouseTile[0]+","+mouseTile[1]];
+
+    if(mouseIsPressed){
+        if(world.regions[mouseRegion]){
+            world.regions[mouseRegion].clicked
+        };
+    };
+};
