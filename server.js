@@ -22,6 +22,7 @@ function newConnection(socket){
     //io.socket.on is recieving info from client
     //io.to(socket.id).emit is sending info to a client
     socket.on("GETINFO", (variable)=>{getInfo(variable,socket)})
+    socket.onAny((n,packet)=>{receiveFromClient(n,pakcet,socket)})
 };
 
 function joinGame(e, socket){
@@ -130,3 +131,31 @@ SJW2.createRegion("WestChina", {"China":3, "Japan":3}, "factory", true)
 SJW2.createRegion("SouthChina", {"China":4, "Japan":2}, "farm", true)
 SJW2.createRegion("EastChina", {"China":5, "Japan":1}, "factory", false)
 SJW2.createRegion("IndoChina", {"China":3, "Japan":3}, "farm", false)
+
+
+
+//////client info request thing
+fetch("localhost:3333")
+  .then(function (response) {
+    if (response.ok) {
+      return response.json();
+    } else {
+      throw new Error(response.statusText);
+    }
+  })
+  .then(function (data) {
+    console.log(data);
+  })
+  .catch(function (error) {
+    console.error(error);
+  })
+
+
+
+  function receiveFromClient(packetName,packet,client){
+    console.log("recieved packet named: " + packetName + ", from client" + client.id)
+  }
+
+  function sendToSpecificClient(clientID,packetName,packet){
+    io.to(clientID).emit(packetName,packet)
+  }
