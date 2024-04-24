@@ -22,7 +22,7 @@ function newConnection(socket){
     //io.socket.on is recieving info from client
     //io.to(socket.id).emit is sending info to a client
     socket.on("GETINFO", (variable)=>{getInfo(variable,socket)})
-    socket.onAny((n,packet)=>{receiveFromClient(n,pakcet,socket)})
+    socket.onAny((packetName,packet)=>{receiveFromClient(packetName,packet,socket)})
 };
 
 function joinGame(e, socket){
@@ -80,9 +80,10 @@ class WORLD{
 }
 
 class REGION{
-    constructor(regionID, controlScores, resourceType, isCity){
+    constructor(regionID, controlScores, intelScores, resourceType, isCity){
         this.regionID = regionID; //stores unique region id
         this.controlScores = controlScores; //stores info on the control state of the region (controlled, contested, in battle, etc)
+        this.intelScores = intelScores; //stores the level of viewing permissions for each nation (dependent of diplomatic relationship, region control, region proximity, etc)
         this.resourceType = resourceType; //stores the resource present in region
         this.isCity = isCity; //stores whether or not the region has a city
         this.regionTiles = [];
@@ -104,7 +105,7 @@ class NATION{
     };
 
     createUnit( type, level, location){
-        let unit = new UNITS(this.nationID, type, level, location);
+        let unit = new UNIT(this.nationID, type, level, location);
         this.units[unitID] = unit;
     };
 };
@@ -123,35 +124,18 @@ class UNIT{
 let SJW2 = new WORLD("HJCC2ndSinoJapWarV1.json");
 SJW2.createNation("China", "#2c358a");
 SJW2.createNation("Japan", "#cf1717");
-SJW2.createRegion("JapanIsl", {"China":1, "Japan":5}, "factory", true)
-SJW2.createRegion("KoreaPen", {"China":1, "Japan":5}, "farm", true)
-SJW2.createRegion("Manchuria", {"China":1, "Japan":5}, "farm", false)
-SJW2.createRegion("NorthChina", {"China":2, "Japan":4}, "factory", false)
-SJW2.createRegion("WestChina", {"China":3, "Japan":3}, "factory", true)
-SJW2.createRegion("SouthChina", {"China":4, "Japan":2}, "farm", true)
-SJW2.createRegion("EastChina", {"China":5, "Japan":1}, "factory", false)
-SJW2.createRegion("IndoChina", {"China":3, "Japan":3}, "farm", false)
+SJW2.createRegion("JapanIsl", {"China":1, "Japan":5}, {"China":1, "Japan":4}, "factory", true)
+SJW2.createRegion("KoreaPen", {"China":1, "Japan":5}, {"China":1, "Japan":4}, "farm", true)
+SJW2.createRegion("Manchuria", {"China":1, "Japan":5}, {"China":2, "Japan":4}, "farm", false)
+SJW2.createRegion("NorthChina", {"China":2, "Japan":4}, {"China":2, "Japan":4}, "factory", false)
+SJW2.createRegion("WestChina", {"China":3, "Japan":3}, {"China":3, "Japan":3}, "factory", true)
+SJW2.createRegion("SouthChina", {"China":4, "Japan":2}, {"China":4, "Japan":2}, "farm", true)
+SJW2.createRegion("EastChina", {"China":5, "Japan":1}, {"China":4, "Japan":1},"factory", false)
+SJW2.createRegion("IndoChina", {"China":3, "Japan":3}, {"China":3, "Japan":3}, "farm", false)
 
 
 
 //////client info request thing
-fetch("localhost:3333")
-  .then(function (response) {
-    if (response.ok) {
-      return response.json();
-    } else {
-      throw new Error(response.statusText);
-    }
-  })
-  .then(function (data) {
-    console.log(data);
-  })
-  .catch(function (error) {
-    console.error(error);
-  })
-
-
-
   function receiveFromClient(packetName,packet,client){
     console.log("recieved packet named: " + packetName + ", from client" + client.id)
   }
