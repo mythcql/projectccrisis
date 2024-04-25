@@ -18,16 +18,14 @@ io.sockets.on('connection', newConnection);
 // io.sockets.on("GETINFO", (variable)=>{getInfo(variable,socket)})
 
 function newConnection(socket){
-	socket.on("JOINGAME",(e)=>{joinGame(e,socket)}); //runs the join game function
+	//socket.on("JOINGAME",(e)=>{joinGame(e,socket)}); //runs the join game function
     //io.socket.on is recieving info from client
     //io.to(socket.id).emit is sending info to a client
     socket.on("GETINFO", (variable)=>{getInfo(variable,socket)})
-    socket.onAny((packetName,packet)=>{receiveFromClient(packetName,packet,socket)})
+    socket.onAny((packetName, packetType, packet)=>{receiveFromClient(packetName, packetType, packet, socket)})
 };
 
-function joinGame(e, socket){
-    console.log(e, socket.id);
-};
+//function joinGame(e, socket){}
 
 //////////////////
 //put the savefile loader thing here
@@ -136,10 +134,27 @@ SJW2.createRegion("IndoChina", {"China":3, "Japan":3}, {"China":3, "Japan":3}, "
 
 
 //////client info request thing
-  function receiveFromClient(packetName,packet,client){
-    console.log("recieved packet named: " + packetName + ", from client" + client.id)
-  }
+  function receiveFromClient(packetName, packetType, packet, client){
+    console.log("Recieved Packet Named: " + packetName + ", from Client: " + client.id)
+    var decodedPacket = decodePacket(packetType, packet);
+    if(packetType == "variableRequest"){
+        var decodedPacket = decodePacket(packetType, packet);
+        console.log(decodedPacket);
+        sendToSpecificClient(client.id, ("response" + packetName), decodedPacket);
+    }
+    else{
+        return
+    };
+  };
 
-  function sendToSpecificClient(clientID,packetName,packet){
-    io.to(clientID).emit(packetName,packet)
-  }
+  function sendToSpecificClient(clientID, packetName, packet){
+    io.to(clientID).emit(packetName, packet)
+  };
+
+  function decodePacket(packetType, packet){
+    if(packetType == "variableRequest"){
+        return(SJW2[packet[0]][packet[1]][packet[2]][packet[3]]);}
+    else{
+        return
+    };
+  };

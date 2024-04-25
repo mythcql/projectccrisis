@@ -88,10 +88,10 @@ function draw(){
     };
 };
 
-function sendToSer(packetName,packet){
-    socket.emit(packetName,packet)
+function sendToServer(packetName, packetType, packet){
+    socket.emit(packetName, packetType, packet)
 }
 
 function recievePacket(packetName,packet){
-    console.log("recieved packet named: " + packetName)
+    console.log("recieved packet named: " + packetName + " containing " + packet)
 }
