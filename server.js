@@ -1,9 +1,10 @@
-console.log("opening");
+console.log("Opening...");
 const fs = require('fs');
 const express = require('express');
 var app = express();
 server = app.listen(3333);
 var socket = require('socket.io');
+const { stringify } = require('querystring');
 var io = socket(server);
 app.use(express.static('client'));
 app.use(express.json());
@@ -136,11 +137,10 @@ SJW2.createRegion("IndoChina", {"China":3, "Japan":3}, {"China":3, "Japan":3}, "
 //////client info request thing
   function receiveFromClient(packetName, packetType, packet, client){
     console.log("Recieved Packet Named: " + packetName + ", from Client: " + client.id)
-    var decodedPacket = decodePacket(packetType, packet);
     if(packetType == "variableRequest"){
         var decodedPacket = decodePacket(packetType, packet);
         console.log(decodedPacket);
-        sendToSpecificClient(client.id, ("response" + packetName), decodedPacket);
+        sendToSpecificClient(client.id, (packetName), (decodedPacket));
     }
     else{
         return
@@ -153,8 +153,16 @@ SJW2.createRegion("IndoChina", {"China":3, "Japan":3}, {"China":3, "Japan":3}, "
 
   function decodePacket(packetType, packet){
     if(packetType == "variableRequest"){
-        return(SJW2[packet[0]][packet[1]][packet[2]][packet[3]]);}
+        ///packet {length, val1, val2, val3, etc}
+        var returnPacket = SJW2
+        let depth = 1
+        while (depth < packet[0]){
+            returnPacket = (returnPacket[packet[depth]]);
+            depth++;
+        };
+        return returnPacket;
+    }
     else{
-        return
+        return;
     };
   };

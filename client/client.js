@@ -1,31 +1,27 @@
-let myCanvas = document.getElementById("myCanvas")
-let ctx = myCanvas.getContext("2d")
-let Height = window.innerWidth >window.innerHeight?window.innerHeight:window.innerWidth
-let Width = window.innerWidth >window.innerHeight?window.innerWidth:window.innerHeight
-myCanvas.style.top = 0
-myCanvas.style.left = 0
-myCanvas.style.zIndex = 5
-myCanvas.width = Width
-WidthM = Width/2
-myCanvas.height = Height
-HeightM = Height/2
-myCanvas.style.position = "absolute"
+let myCanvas = document.getElementById("myCanvas");
+let ctx = myCanvas.getContext("2d");
+let Height = window.innerWidth >window.innerHeight?window.innerHeight:window.innerWidth;
+let Width = window.innerWidth >window.innerHeight?window.innerWidth:window.innerHeight;
+myCanvas.style.top = 0;
+myCanvas.style.left = 0;
+myCanvas.style.zIndex = 5;
+myCanvas.width = Width;
+WidthM = Width/2;
+myCanvas.height = Height;
+HeightM = Height/2;
+myCanvas.style.position = "absolute";
 
-const socket = io.connect('/')
-let info = "yum"
-socket.emit("JOINGAME", info)
+const socket = io.connect('/');
+socket.emit("JOINGAME", "Client ID:");
+socket.onAny((packetName, packet)=>{recievePacket(packetName, packet)});
 
-socket.on("SENDINFO", (gotInfo)=>{console.log(gotInfo)});
-socket.onAny((e,n)=>{recievePacket(e,n)})
-socket.emit("GETINFO", Shanghai.controlScores);
+function sendToServer(packetName, packetType, packet){
+    socket.emit(packetName, packetType, packet)
+}
 
-//info fetching thing
-fetch("localhost:3333", {
-    method: "GET",
-    headers: {
-        "Content-Type": "info/region",
-    },
-});
+function recievePacket(packetName, packet){
+    console.log("recieved packet named: " + packetName + " containing " + packet)
+}
 
 ////////////////////////////////////////////////////////
 //world.worldTiles
@@ -88,10 +84,3 @@ function draw(){
     };
 };
 
-function sendToServer(packetName, packetType, packet){
-    socket.emit(packetName, packetType, packet)
-}
-
-function recievePacket(packetName,packet){
-    console.log("recieved packet named: " + packetName + " containing " + packet)
-}
