@@ -140,7 +140,7 @@ SJW2.createRegion("IndoChina", {"China":3, "Japan":3}, {"China":3, "Japan":3}, "
     if(packetType == "variableRequest"){
         var decodedPacket = decodePacket(packetType, packet);
         console.log(decodedPacket);
-        sendToSpecificClient(client.id, (packetName), (decodedPacket));
+        sendToSpecificClient(client.id, (packetName), JSON.stringify(decodedPacket));
     }
     else{
         return
