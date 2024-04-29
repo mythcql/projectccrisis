@@ -32,10 +32,11 @@ function recievePacket(packetName, packet){
 let img;
 function setup() {
   createCanvas(window.innerWidth, window.innerHeight);
-    img = createImg('https://geology.com/world/china-provinces-map.gif');
+  img = createImg('https://geology.com/world/china-provinces-map.gif');
+  drawbackground()
 };
 
-function draw() {
+function drawbackground() {
     background(220);
     image(img,0,0,900*scale,822*scale);
 };
@@ -45,13 +46,12 @@ let zoomFactor = 1;
 let regionTileSize = 30*zoomFactor;
 let mouseTile= [0,0]; //what tile the mouse is on
 let mouseRegion; //what region the mouse is on
-let currentRegion; //the region you are currently creating
+let buildRegion; //the region you are currently creating
 
 
 ///for creating regions
-function draw(){
+function createRegionsDraw(){
     mouseTile = [Math.floor(mouseX/regionTileSize),Math.floor(mouseY/regionTileSize)];
-    mouseRegion = world.worldTiles[mouseTile[0]+","+mouseTile[1]];
 
     if(mouseIsPressed){
         if(mouseRegion){
@@ -63,14 +63,19 @@ function draw(){
         fill("rgba(240, 240, 240, 0.3)")
         rect(mouseTile[0]*sqsize,mouseTile[1]*sqsize,sqsize,sqsize)
     if(mousedown){
-      currentRegion.addSquare(mouseTile[0],mouseTile[1])
+        addTileToRegion()
     };
 };
 
+function addTileToRegion(){
+    sendToServer("worldTileRegionSet", "variableModify", [4, "dictChange", "worldTiles["+mouseTile[0]+","+mouseTile[1]+"]", buildRegion]);
+    sendToServer("regionTileSet", "variableModify", [6, "arrayAdd", "regions", buildRegion, "regionTiles", [mouseTile[0]+","+mouseTile[1]]]);
+};
+
 ///for viewing regions
-function draw(){
+function viewMapDraw(){
     mouseTile = [Math.floor(mouseX/regionTileSize),Math.floor(mouseY/regionTileSize)];
-    mouseRegion = world.worldTiles[mouseTile[0]+","+mouseTile[1]];
+    mouseRegion = sendToServer("mouseRegionRequest", "variableRequest", [3, "worldTiles", [mouseTile[0]+","+mouseTile[1]]]);
 
     fill(mouseRegion.hovercolor)
     mouseRegion.grids.forEach((e)=>{

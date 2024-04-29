@@ -22,7 +22,6 @@ function newConnection(socket){
 	//socket.on("JOINGAME",(e)=>{joinGame(e,socket)}); //runs the join game function
     //io.socket.on is recieving info from client
     //io.to(socket.id).emit is sending info to a client
-    socket.on("GETINFO", (variable)=>{getInfo(variable,socket)})
     socket.onAny((packetName, packetType, packet)=>{receiveFromClient(packetName, packetType, packet, socket)})
 };
 
@@ -135,34 +134,55 @@ SJW2.createRegion("IndoChina", {"China":3, "Japan":3}, {"China":3, "Japan":3}, "
 
 
 //////client info request thing
-  function receiveFromClient(packetName, packetType, packet, client){
-    console.log("Recieved Packet Named: " + packetName + ", from Client: " + client.id)
+function receiveFromClient(packetName, packetType, packet, client){
+    console.log("Recieved Packet Named: " + packetName + ", from Client: " + client.id);
+    if(packetType == "loginCredentials"){
+
+    }
     if(packetType == "variableRequest"){
-        var decodedPacket = decodePacket(packetType, packet);
-        console.log(decodedPacket);
-        sendToSpecificClient(client.id, (packetName), JSON.stringify(decodedPacket));
+        ///packet (lengthOfPath, path1, path2, path(length))
+        var returnPacket = SJW2
+        let depth = 0
+        while (depth < (packet[0]+1)){
+            returnPacket = (returnPacket[packet[depth]]);
+            depth++;
+        };
+
+        sendToSpecificClient(client.id, (packetName), JSON.stringify(returnPacket));
+        return;
+    }
+    if(packetType == "variableModify"){
+        //packet (lengthOfPath, modificationType, path1, path2, path(length), (mods))
+        var variablePath = SJW2
+        let depth = 0
+        while (depth < (packet[0]+2)){
+            variablePath = (returnPacket[packet[depth]]);
+            depth++;
+        };
+
+        decodedMods = decodeMods(packet[1], packet[packet[0]+1]);
+
+        if(packet[1] == "varChange"){
+            variablePath = decodedMods;
+            return;
+        }
+        if(packet[1] == "arrayAdd"){
+            variablePath =+ decodedMods;
+            return;
+        }
+        if(packet[1] == "dictChange"){
+            variablePath[decodedMods[0]] = decodedMods[1];
+            return;
+        }
+        else{
+            return;
+        };
     }
     else{
         return
     };
-  };
+};
 
   function sendToSpecificClient(clientID, packetName, packet){
     io.to(clientID).emit(packetName, packet)
-  };
-
-  function decodePacket(packetType, packet){
-    if(packetType == "variableRequest"){
-        ///packet {length, val1, val2, val3, etc}
-        var returnPacket = SJW2
-        let depth = 1
-        while (depth < packet[0]){
-            returnPacket = (returnPacket[packet[depth]]);
-            depth++;
-        };
-        return returnPacket;
-    }
-    else{
-        return;
-    };
   };
