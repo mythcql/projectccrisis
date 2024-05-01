@@ -5,7 +5,7 @@ const express = require('express');
 var app = express();
 server = app.listen(3333);
 var socket = require('socket.io');
-const {stringify} = require('querystring');
+const{stringify} = require('querystring');
 var io = socket(server);
 app.use(express.static('client'));
 app.use(express.json());
@@ -17,9 +17,9 @@ console.log("Server has opened: "+Date.now());
 
 io.sockets.on('connection', newConnection);
 function newConnection(socket){
-    socket.onAny((packetName, packetType, packet)=>{receiveFromClient(packetName, packetType, packet, socket)})
-    SJW2.connectedClients[socket.id] = "noLogin"
-    console.log("New Client Connected: " + socket.id)
+    socket.onAny((packetName, packetType, packet)=>{receiveFromClient(packetName, packetType, packet, socket)});
+    SJW2.connectedClients[socket.id] = "noLogin";
+    console.log("New Client Connected: " + socket.id);
 };
 //////////
 
@@ -31,17 +31,17 @@ function receiveFromClient(packetName, packetType, packet, client){
     if(packetType == "loginCredentials"){
         //packet (username, passsword)
         if (SJW2.validLogins[(packet[0]+ ", " + packet[1])]){
-            SJW2.connectedClients[client.id] = JSON.stringify(SJW2.validLogins[(packet[0] + ", " + packet[1])])
-            console.log(client.id + " Login Success, New Permission Level: " + SJW2.connectedClients[client.id])
+            SJW2.connectedClients[client.id] = JSON.stringify(SJW2.validLogins[(packet[0] + ", " + packet[1])]);
+            console.log(client.id + " Login Success, New Permission Level: " + SJW2.connectedClients[client.id]);
         }
         else{
-            console.log("invalid login")
+            console.log("invalid login");
         }
     }
     if(packetType == "variableRequest"){
         //packet (lengthOfPath, path1, path2, path(length))
-        var returnPacket = SJW2
-        let depth = 1
+        var returnPacket = SJW2;
+        let depth = 1;
         while (depth < ((packet[0])+1)){
             returnPacket = (returnPacket[packet[depth]]);
             depth++;
@@ -51,8 +51,8 @@ function receiveFromClient(packetName, packetType, packet, client){
     }
     if(packetType == "variableModify"){
         //packet (lengthOfPath, modificationType, path1, path2, path(length), (mods))
-        var variablePath = SJW2
-        let depth = 2
+        var variablePath = SJW2;
+        let depth = 2;
         while (depth < ((packet[0])+2)){
             variablePath = (variablePath[packet[depth]]);
             depth++;
@@ -75,12 +75,10 @@ function receiveFromClient(packetName, packetType, packet, client){
     }
     else{
     };
-
-    return
 };
 
 function sendToSpecificClient(clientID, packetName, packet){
-    io.to(clientID).emit(packetName, packet)
+    io.to(clientID).emit(packetName, packet);
 };
 //////////
 
@@ -90,14 +88,14 @@ function sendToSpecificClient(clientID, packetName, packet){
 class WORLD{
     //modify permission level: admin
     //view permission level: overlord, all directors, all chairs, all spectators
-    constructor(saveFile){
+    constructor(saveFile, loginInfo){
         this.saveFile = saveFile;
         this.worldID = 0o0;
         this.nations = {};
         this.regions = {};
         this.idToName = {};
         this.worldTiles = {};
-        this.validLogins = {"admin, adminPassTemp":"admin", "overlord, overlordPassTemp":"overlord", "chineseDirector, chinaDirPassTemp":"directorChina", "japaneseDirector, japanDirPassTemp":"directorJapan", "chineseChair, chinaChaPassTemp":"chairChina", "japaneseChair, japanChaPassTemp":"chairJapan", "spectatorChina":("chinaSpectator", "chinaSpecPassTemp"), "spectatorJapan":("japanSpectator", "japanSpecPassTemp")};
+        this.validLogins = loginInfo;
         this.connectedClients = {};
     };
     createNation(nationID, color){
@@ -188,14 +186,24 @@ const pSBC=(p,c0,c1,l)=>{
 
 
 /////Temp Save///// 
-let SJW2 = new WORLD("HJCC2ndSinoJapWarV1.json");
+let SJW2 = new WORLD("HJCC2ndSinoJapWarV1.json", {
+    "admin, adminPassTemp":"admin", 
+    "overlord, overlordPassTemp":"overlord", 
+    "chineseDirector, chinaDirPassTemp":"directorChina", 
+    "japaneseDirector, japanDirPassTemp":"directorJapan", 
+    "chineseChair, chinaChaPassTemp":"chairChina", 
+    "japaneseChair, japanChaPassTemp":"chairJapan", 
+    "chinaSpectator, chinaSpecPassTemp":"spectatorChina", 
+    "japanSpectator, japanSpecPassTemp":"spectatorJapan"
+    }
+);
 SJW2.createNation("China", "#2c358a");
 SJW2.createNation("Japan", "#cf1717");
-SJW2.createRegion("JapanIsl", {"China":1, "Japan":5}, {"China":1, "Japan":4}, "factory", true)
-SJW2.createRegion("KoreaPen", {"China":1, "Japan":5}, {"China":1, "Japan":4}, "farm", true)
-SJW2.createRegion("Manchuria", {"China":1, "Japan":5}, {"China":2, "Japan":4}, "farm", false)
-SJW2.createRegion("NorthChina", {"China":2, "Japan":4}, {"China":2, "Japan":4}, "factory", false)
-SJW2.createRegion("WestChina", {"China":3, "Japan":3}, {"China":3, "Japan":3}, "factory", true)
-SJW2.createRegion("SouthChina", {"China":4, "Japan":2}, {"China":4, "Japan":2}, "farm", true)
-SJW2.createRegion("EastChina", {"China":5, "Japan":1}, {"China":4, "Japan":1},"factory", false)
-SJW2.createRegion("IndoChina", {"China":3, "Japan":3}, {"China":3, "Japan":3}, "farm", false)
+SJW2.createRegion("JapanIsl", {"China":1, "Japan":5}, {"China":1, "Japan":4}, "factory", true);
+SJW2.createRegion("KoreaPen", {"China":1, "Japan":5}, {"China":1, "Japan":4}, "farm", true);
+SJW2.createRegion("Manchuria", {"China":1, "Japan":5}, {"China":2, "Japan":4}, "farm", false);
+SJW2.createRegion("NorthChina", {"China":2, "Japan":4}, {"China":2, "Japan":4}, "factory", false);
+SJW2.createRegion("WestChina", {"China":3, "Japan":3}, {"China":3, "Japan":3}, "factory", true);
+SJW2.createRegion("SouthChina", {"China":4, "Japan":2}, {"China":4, "Japan":2}, "farm", true);
+SJW2.createRegion("EastChina", {"China":5, "Japan":1}, {"China":4, "Japan":1},"factory", false);
+SJW2.createRegion("IndoChina", {"China":3, "Japan":3}, {"China":3, "Japan":3}, "farm", false);
