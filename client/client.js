@@ -1,3 +1,4 @@
+/////Client Setup/////
 let myCanvas = document.getElementById("myCanvas");
 let ctx = myCanvas.getContext("2d");
 let Height = window.innerWidth >window.innerHeight?window.innerHeight:window.innerWidth;
@@ -22,13 +23,11 @@ function sendToServer(packetName, packetType, packet){
 function recievePacket(packetName, packet){
     console.log("recieved packet named: " + packetName + " containing " + packet)
 }
+//////////
 
-////////////////////////////////////////////////////////
-//world.worldTiles
-//world.regions
-//
-//test
 
+
+////
 let img;
 function setup() {
   createCanvas(window.innerWidth, window.innerHeight);
