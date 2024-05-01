@@ -18,6 +18,8 @@ console.log("Server has opened: "+Date.now());
 io.sockets.on('connection', newConnection);
 function newConnection(socket){
     socket.onAny((packetName, packetType, packet)=>{receiveFromClient(packetName, packetType, packet, socket)})
+    SJW2.connectedClients[socket.id] = "noLogin"
+    console.log("New Client Connected: " + socket.id)
 };
 //////////
 
@@ -25,9 +27,16 @@ function newConnection(socket){
 
 /////Server Client Communication/////
 function receiveFromClient(packetName, packetType, packet, client){
-    console.log("Recieved Packet Named: " + packetName + ", from Client: " + client.id);
+    console.log("Recieved Packet Named: " + packetName + ", from Client: " + client.id + ", Permission Level: " + SJW2.connectedClients[client.id]);
     if(packetType == "loginCredentials"){
-
+        console.log(packet[0]+ ", " + packet[1]);
+        if (SJW2.validLogins[(packet[0]+ ", " + packet[1])]){
+            SJW2.connectedClients[client.id] = JSON.stringify(SJW2.validLogins[(packet[0] + ", " + packet[1])])
+            console.log("Login Success, New Permission Level: " + SJW2.connectedClients[client.id])
+        }
+        else{
+            console.log("invalid login")
+        }
     }
     if(packetType == "variableRequest"){
         ///packet (lengthOfPath, path1, path2, path(length))
@@ -78,13 +87,6 @@ function sendToSpecificClient(clientID, packetName, packet){
 
 
 
-/////
-
-
-/////
-
-
-
 /////Basic Class Creators/////
 class WORLD{
     constructor(saveFile){
@@ -93,7 +95,9 @@ class WORLD{
         this.nations = {};
         this.regions = {};
         this.idToName = {};
-        this.worldTiles = {}
+        this.worldTiles = {};
+        this.validLogins = {"admin, adminPassTemp":"admin", "chineseDirector, chinaDirPassTemp":"directorChina", "japaneseDirector, japanDirPassTemp":"directorJapan", "chineseChair, chinaChaPassTemp":"chairChina", "japaneseChair, japanChaPassTemp":"chairJapan", "spectatorChina":("chinaSpectator", "chinaSpecPassTemp"), "spectatorJapan":("japanSpectator", "japanSpecPassTemp")};
+        this.connectedClients = {};
     };
     createNation(nationID, color){
         let nation = new NATION(nationID, color);

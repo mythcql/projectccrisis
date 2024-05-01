@@ -13,7 +13,6 @@ HeightM = Height/2;
 myCanvas.style.position = "absolute";
 
 const socket = io.connect('/');
-socket.emit("JOINGAME", "Client ID:");
 socket.onAny((packetName, packet)=>{recievePacket(packetName, packet)});
 
 function sendToServer(packetName, packetType, packet){
@@ -27,7 +26,24 @@ function recievePacket(packetName, packet){
 
 
 
-////
+/////Login & Permissions/////
+function login(){
+    sendToServer("loginRequest", "loginCredentials", [])
+}
+
+
+
+//////////
+
+
+
+/////
+let zoomFactor = 1;
+let regionTileSize = 30*zoomFactor;
+let mouseTile= [0,0]; //what tile the mouse is on
+let mouseRegion; //what region the mouse is on
+let buildRegion; //the region you are currently creating
+
 let img;
 function setup() {
   createCanvas(window.innerWidth, window.innerHeight);
@@ -35,18 +51,10 @@ function setup() {
   drawbackground()
 };
 
-function drawbackground() {
+function drawBackground() {
     background(220);
     image(img,0,0,900*scale,822*scale);
 };
-/////////
-
-let zoomFactor = 1;
-let regionTileSize = 30*zoomFactor;
-let mouseTile= [0,0]; //what tile the mouse is on
-let mouseRegion; //what region the mouse is on
-let buildRegion; //the region you are currently creating
-
 
 ///for creating regions
 function createRegionsDraw(){
@@ -57,7 +65,6 @@ function createRegionsDraw(){
             mouseRegion.builderClick
         };
     };
-
     currentRegion.draw()
         fill("rgba(240, 240, 240, 0.3)")
         rect(mouseTile[0]*sqsize,mouseTile[1]*sqsize,sqsize,sqsize)
@@ -67,8 +74,8 @@ function createRegionsDraw(){
 };
 
 function addTileToRegion(){
-    sendToServer("worldTileRegionSet", "variableModify", [4, "dictChange", "worldTiles["+mouseTile[0]+","+mouseTile[1]+"]", buildRegion]);
-    sendToServer("regionTileSet", "variableModify", [6, "arrayAdd", "regions", buildRegion, "regionTiles", [mouseTile[0]+","+mouseTile[1]]]);
+    sendToServer("worldTileRegionSet", "variableModify", [1, "dictChange", "worldTiles", [[mouseTile[0]+","+mouseTile[1]], buildRegion]]);
+    sendToServer("regionTileSet", "variableModify", [3, "arrayAdd", "regions", JSON.stringify[buildRegion], "regionTiles", [mouseTile[0]+","+mouseTile[1]]]);
 };
 
 ///for viewing regions
@@ -87,4 +94,3 @@ function viewMapDraw(){
         };
     };
 };
-
