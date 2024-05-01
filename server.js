@@ -29,21 +29,20 @@ function newConnection(socket){
 function receiveFromClient(packetName, packetType, packet, client){
     console.log("Recieved Packet Named: " + packetName + ", from Client: " + client.id + ", Permission Level: " + SJW2.connectedClients[client.id]);
     if(packetType == "loginCredentials"){
-        console.log(packet[0]+ ", " + packet[1]);
+        //packet (username, passsword)
         if (SJW2.validLogins[(packet[0]+ ", " + packet[1])]){
             SJW2.connectedClients[client.id] = JSON.stringify(SJW2.validLogins[(packet[0] + ", " + packet[1])])
-            console.log("Login Success, New Permission Level: " + SJW2.connectedClients[client.id])
+            console.log(client.id + " Login Success, New Permission Level: " + SJW2.connectedClients[client.id])
         }
         else{
             console.log("invalid login")
         }
     }
     if(packetType == "variableRequest"){
-        ///packet (lengthOfPath, path1, path2, path(length))
+        //packet (lengthOfPath, path1, path2, path(length))
         var returnPacket = SJW2
         let depth = 1
         while (depth < ((packet[0])+1)){
-            console.log(returnPacket)
             returnPacket = (returnPacket[packet[depth]]);
             depth++;
         };
@@ -89,6 +88,8 @@ function sendToSpecificClient(clientID, packetName, packet){
 
 /////Basic Class Creators/////
 class WORLD{
+    //modify permission level: admin
+    //view permission level: overlord, all directors, all chairs, all spectators
     constructor(saveFile){
         this.saveFile = saveFile;
         this.worldID = 0o0;
@@ -96,7 +97,7 @@ class WORLD{
         this.regions = {};
         this.idToName = {};
         this.worldTiles = {};
-        this.validLogins = {"admin, adminPassTemp":"admin", "chineseDirector, chinaDirPassTemp":"directorChina", "japaneseDirector, japanDirPassTemp":"directorJapan", "chineseChair, chinaChaPassTemp":"chairChina", "japaneseChair, japanChaPassTemp":"chairJapan", "spectatorChina":("chinaSpectator", "chinaSpecPassTemp"), "spectatorJapan":("japanSpectator", "japanSpecPassTemp")};
+        this.validLogins = {"admin, adminPassTemp":"admin", "overlord, overlordPassTemp":"overlord", "chineseDirector, chinaDirPassTemp":"directorChina", "japaneseDirector, japanDirPassTemp":"directorJapan", "chineseChair, chinaChaPassTemp":"chairChina", "japaneseChair, japanChaPassTemp":"chairJapan", "spectatorChina":("chinaSpectator", "chinaSpecPassTemp"), "spectatorJapan":("japanSpectator", "japanSpecPassTemp")};
         this.connectedClients = {};
     };
     createNation(nationID, color){
@@ -107,9 +108,11 @@ class WORLD{
         let region = new REGION(regionID, controlScores, resourceType, isCity);
         this.regions[regionID] = region;
     };
-}
+};
 
 class REGION{
+    //full modify permission level: admin, overlord
+    //full view permission level: all directors, all chairs, all spectators
     constructor(regionID, controlScores, intelScores, resourceType, isCity){
         this.regionID = regionID; //stores unique region id
         this.controlScores = controlScores; //stores info on the control state of the region (controlled, contested, in battle, etc)
@@ -118,14 +121,13 @@ class REGION{
         this.isCity = isCity; //stores whether or not the region has a city
         this.regionTiles = [];
     };
-
-    addTileToRegion(x,y){
-
-    };
 };
 
 
 class NATION{
+    //full modify permission level: admin, overlord, nation director
+    //full view permission level: admin, overlord, all directors, nation chair, nation spectator
+    //conditional view permission level: all chairs, all spectators
     constructor(nationID, color){
         this.nationID = nationID; //stores unique nation id
         this.colorCtrl5 = color; //stores default color
@@ -134,19 +136,22 @@ class NATION{
         this.units = {};
     };
 
-    createUnit( type, level, location){
+    createUnit(type, level, location){
         let unit = new UNIT(this.nationID, type, level, location);
         this.units[unitID] = unit;
     };
 };
 
 class UNIT{
+    //full modify permission level: admin, overlord, nation director
+    //full view permission level: all directors, nation chair, nation spectator
+    //conditional view permission level: all chairs, all spectators
     constructor(unitID, owner, type, level, location){
-        this.unitID = unitID; //10 bit binary number, stores unique unit id
-        this.owner = owner; //4 bit binary number, stores the nation id of owner
-        this.type = type; //2 bit binary number, stores the type of unit
-        this.level = level; //5 bit binary number, stores the level of unit
-        this.location = location; //8 bit binary number, stores the region id of location
+        this.unitID = unitID; //stores unique unit id
+        this.owner = owner; //stores the nation id of owner
+        this.type = type; //stores the type of unit
+        this.level = level; //stores the level of unit
+        this.location = location; //stores the region id of location
     };
 };
 //////////

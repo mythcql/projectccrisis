@@ -20,15 +20,15 @@ function sendToServer(packetName, packetType, packet){
 }
 
 function recievePacket(packetName, packet){
-    console.log("recieved packet named: " + packetName + " containing " + packet)
+    console.log("Recieved packet named: " + packetName + ", Containing: " + packet)
 }
 //////////
 
 
 
 /////Login & Permissions/////
-function login(){
-    sendToServer("loginRequest", "loginCredentials", [])
+function login(username, password){
+    sendToServer("loginRequest", "loginCredentials", [username, password])
 }
 
 
