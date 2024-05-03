@@ -29,10 +29,7 @@ function recievePacket(packetName, packet){
 /////Login & Permissions/////
 function login(username, password){
     sendToServer("loginRequest", "loginCredentials", [username, password])
-}
-
-
-
+};
 //////////
 
 

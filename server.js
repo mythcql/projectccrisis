@@ -25,7 +25,7 @@ function newConnection(socket){
 
 
 
-/////Server Client Communication/////
+/////Server-Client Communication/////
 function receiveFromClient(packetName, packetType, packet, client){
     console.log("Recieved Packet Named: " + packetName + ", from Client: " + client.id + ", Permission Level: " + SJW2.connectedClients[client.id]);
     if(packetType == "loginCredentials"){
@@ -40,15 +40,32 @@ function receiveFromClient(packetName, packetType, packet, client){
     }
     if(packetType == "variableRequest"){
         //packet (lengthOfPath, path1, path2, path(length))
-        var returnPacket = SJW2;
+        var variablePath = SJW2;
         let depth = 1;
         while (depth < ((packet[0])+1)){
-            returnPacket = (returnPacket[packet[depth]]);
+            variablePath = (variablePath[packet[depth]]);
             depth++;
         };
 
-        sendToSpecificClient(client.id, (packetName), JSON.stringify(returnPacket));
+        let variablePathPermission = SJW2[packet[1]][packet[2]]
+        console.log(SJW2.connectedClients[client.id]);
+        console.log(variablePathPermission.permissions["admin"]);
+        console.log(variablePathPermission.permissions[SJW2.connectedClients[client.id]]);
+
+        if ((variablePathPermission.permissions[SJW2.connectedClients[client.id]] == 4)){
+            sendToSpecificClient(client.id, (packetName), JSON.stringify(variablePath));
+        }
+        if((variablePathPermission.permissions[SJW2.connectedClients[client.id]] == 2)){
+            sendToSpecificClient(client.id, (packetName), "partial permission thing that hasnt been finished");
+        }
+        if((variablePathPermission.permissions[SJW2.connectedClients[client.id]] == 0)){
+            sendToSpecificClient(client.id, (packetName), "access denied, permission not granted");
+        }
+        else{
+            console.log("no permission thingie");
+        };
     }
+
     if(packetType == "variableModify"){
         //packet (lengthOfPath, modificationType, path1, path2, path(length), (mods))
         var variablePath = SJW2;
@@ -118,6 +135,9 @@ class REGION{
         this.resourceType = resourceType; //stores the resource present in region
         this.isCity = isCity; //stores whether or not the region has a city
         this.regionTiles = [];
+        this.occupingUnits = [];
+        this.adjacentRegions = [];
+        this.permissions = {};
     };
 };
 
@@ -132,6 +152,7 @@ class NATION{
         this.colorCtrl4 = pSBC(0.3, this.colorCtrl5); 
         this.colorCtrl6 = pSBC(-0.3, this.colorCtrl5);
         this.units = {};
+        this.permissions = {["admin"]:4, ["overlord"]:4, ["director" + ", " + nationID]:4, ["director"]:3, ["chair" + ", " + nationID]:3, ["spectator" + ", " + nationID]:3, ["chair"]:1, ["spectator"]:1, ["noLogin"]:0};
     };
 
     createUnit(type, level, location){
@@ -150,6 +171,8 @@ class UNIT{
         this.type = type; //stores the type of unit
         this.level = level; //stores the level of unit
         this.location = location; //stores the region id of location
+        this.permissions = [owner].permissions
+        [location].occupingUnits = this.unitID;
     };
 };
 //////////
@@ -187,16 +210,17 @@ const pSBC=(p,c0,c1,l)=>{
 
 /////Temp Save///// 
 let SJW2 = new WORLD("HJCC2ndSinoJapWarV1.json", {
-    "admin, adminPassTemp":"admin", 
+    "admin, adminPassTemp":"admin",
     "overlord, overlordPassTemp":"overlord", 
-    "chineseDirector, chinaDirPassTemp":"directorChina", 
-    "japaneseDirector, japanDirPassTemp":"directorJapan", 
-    "chineseChair, chinaChaPassTemp":"chairChina", 
-    "japaneseChair, japanChaPassTemp":"chairJapan", 
-    "chinaSpectator, chinaSpecPassTemp":"spectatorChina", 
-    "japanSpectator, japanSpecPassTemp":"spectatorJapan"
+    "chineseDirector, chinaDirPassTemp":["director", "China"], 
+    "japaneseDirector, japanDirPassTemp":["director", "Japan"], 
+    "chineseChair, chinaChaPassTemp":["chair", "China"], 
+    "japaneseChair, japanChaPassTemp":["chair", "Japan"], 
+    "chinaSpectator, chinaSpecPassTemp":["spectator", "China"], 
+    "japanSpectator, japanSpecPassTemp":["spectator", "Japan"]
     }
 );
+
 SJW2.createNation("China", "#2c358a");
 SJW2.createNation("Japan", "#cf1717");
 SJW2.createRegion("JapanIsl", {"China":1, "Japan":5}, {"China":1, "Japan":4}, "factory", true);
@@ -207,3 +231,4 @@ SJW2.createRegion("WestChina", {"China":3, "Japan":3}, {"China":3, "Japan":3}, "
 SJW2.createRegion("SouthChina", {"China":4, "Japan":2}, {"China":4, "Japan":2}, "farm", true);
 SJW2.createRegion("EastChina", {"China":5, "Japan":1}, {"China":4, "Japan":1},"factory", false);
 SJW2.createRegion("IndoChina", {"China":3, "Japan":3}, {"China":3, "Japan":3}, "farm", false);
+///////////
