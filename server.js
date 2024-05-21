@@ -1,4 +1,5 @@
 /////Server Setup/////
+//node -e "$(cat server.js)" -i
 console.log("Opening...");
 const fs = require('fs');
 const express = require('express');
@@ -31,7 +32,7 @@ function receiveFromClient(packetName, packetType, packet, client){
     if(packetType == "loginCredentials"){
         //packet (username, passsword)
         if (SJW2.validLogins[(packet[0]+ ", " + packet[1])]){
-            SJW2.connectedClients[client.id] = JSON.stringify(SJW2.validLogins[(packet[0] + ", " + packet[1])]);
+            SJW2.connectedClients[client.id] = SJW2.validLogins[(packet[0] + ", " + packet[1])];
             console.log(client.id + " Login Success, New Permission Level: " + SJW2.connectedClients[client.id]);
         }
         else{
@@ -47,18 +48,22 @@ function receiveFromClient(packetName, packetType, packet, client){
             depth++;
         };
 
-        let variablePathPermission = SJW2[packet[1]][packet[2]]
-        console.log(SJW2.connectedClients[client.id]);
-        console.log(variablePathPermission.permissions["admin"]);
-        console.log(variablePathPermission.permissions[SJW2.connectedClients[client.id]]);
+        var variablePathPermission = SJW2[packet[1]][packet[2]]
+        console.log(packet)
+        var clientPermission = (SJW2.connectedClients[client.id]);
+
+        console.log(variablePathPermission.permissions);
+        console.log(clientPermission);
+        console.log(variablePathPermission.permissions[clientPermission]);
+
 
         if ((variablePathPermission.permissions[SJW2.connectedClients[client.id]] == 4)){
             sendToSpecificClient(client.id, (packetName), JSON.stringify(variablePath));
         }
-        if((variablePathPermission.permissions[SJW2.connectedClients[client.id]] == 2)){
+        else if((variablePathPermission.permissions[SJW2.connectedClients[client.id]] == 2)){
             sendToSpecificClient(client.id, (packetName), "partial permission thing that hasnt been finished");
         }
-        if((variablePathPermission.permissions[SJW2.connectedClients[client.id]] == 0)){
+        else if((variablePathPermission.permissions[SJW2.connectedClients[client.id]] == 0)){
             sendToSpecificClient(client.id, (packetName), "access denied, permission not granted");
         }
         else{
@@ -211,13 +216,13 @@ const pSBC=(p,c0,c1,l)=>{
 /////Temp Save///// 
 let SJW2 = new WORLD("HJCC2ndSinoJapWarV1.json", {
     "admin, adminPassTemp":"admin",
-    "overlord, overlordPassTemp":"overlord", 
-    "chineseDirector, chinaDirPassTemp":["director", "China"], 
-    "japaneseDirector, japanDirPassTemp":["director", "Japan"], 
-    "chineseChair, chinaChaPassTemp":["chair", "China"], 
-    "japaneseChair, japanChaPassTemp":["chair", "Japan"], 
-    "chinaSpectator, chinaSpecPassTemp":["spectator", "China"], 
-    "japanSpectator, japanSpecPassTemp":["spectator", "Japan"]
+    "overlord, overlordPassTemp":"overlord",
+    "chineseDirector, chinaDirPassTemp":("director", "China"), 
+    "japaneseDirector, japanDirPassTemp":("director", "Japan"), 
+    "chineseChair, chinaChaPassTemp":("chair", "China"), 
+    "japaneseChair, japanChaPassTemp":("chair", "Japan"), 
+    "chinaSpectator, chinaSpecPassTemp":("spectator", "China"), 
+    "japanSpectator, japanSpecPassTemp":("spectator", "Japan")
     }
 );
 

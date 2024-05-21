@@ -1,20 +1,44 @@
 <!DOCTYPE html>
-<html>
-<head>
-<!-- <link rel="icon" href="../../images/psim2.png"> -->
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable = no, maximum-scale=1, minimum-scale=1">
-  <title>Command</title>
-</head>
-<body style="padding:0;margin:0;background-color: rgb(121, 157, 167);" preload = "metadata">
 
-<canvas id="myCanvas" disabled="true" style = "z-index: 1;touch-action: none; user-select: none;
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link href="styles/style.css" rel="stylesheet" />
+
+<link rel="icon" href="favicon.ico" type="image/x-icon" />
+<link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable = no, maximum-scale=1, minimum-scale=1">
+<title>Command</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+</head>
+<body style="padding:0;margin:0;background-color: #78c4e3;" preload="metadata">
+
+<canvas id="myCanvas" disabled="true" style="z-index: 1;touch-action: none; user-select: none;
 -webkit-user-select: none;
--moz-user-select: none;"></canvas>
+-moz-user-select: none; top:8%; left:6%"></canvas>
+
+<div id="menuBar" style="background-color:#e86969; position:fixed; height:100%;">
+
+</div>
+<!--<div id="topBar" style="background-color:#e55454; position:fixed; width:100%; height:8%;"></div>-->
+<div id="infoBar" style="background-color:#fceaea; position:fixed; height:100%; right:0">
+  <h1 id="regionInformationHeader" preload="metadata">Region Info</h1>
+</div>
+
+<script>
+  let calculatedMenuBarWidth = Math.floor((window.innerHeight)*0.08)
+  document.getElementById("menuBar").style.width = calculatedMenuBarWidth+"px"
+
+  let calculatedInfoBarWidth = Math.floor((window.innerHeight)*0.44)
+  document.getElementById("infoBar").style.width = calculatedInfoBarWidth+"px"
+</script>
 
 <script src="/socket.io/socket.io.js"></script>
 <script src="https://cdn.socket.io/3.1.3/socket.io.min.js" integrity="sha384-cPwlPLvBTa3sKAgddT6krw0cJat7egBga3DJepJyrLl4Q9/5WLra3rrnMcyTyOnh" crossorigin="anonymous"></script>
 
 <script src="client.js"></script>
-</body>
-</html>
+
+</body></html>
