@@ -23,6 +23,15 @@ function recievePacket(packetName, packet){
 //////////
 
 
+
+/////Login & Permissions/////
+function login(username, password){
+    sendToServer("loginRequest", "loginCredentials", [username, password])
+};
+//////////
+
+
+
 class region{
     constructor(){
       this.grids = []
@@ -57,51 +66,37 @@ class region{
   }
 
 
-/////Login & Permissions/////
-function login(username, password){
-    sendToServer("loginRequest", "loginCredentials", [username, password])
-};
-//////////
 
 
 
 /////
+let mapViewMode = "editRegions"
+
+
 let zoomFactor = 1;
 let regionTileSize = 20*zoomFactor;
-let mouseTile= 0; //what tile the mouse is on
-let mouseRegion; //what region the mouse is on
-let buildRegion = world.regions.IndoChina
-
-let img;
-
-setInterval(()=>{createRegionsDraw()},10)
-
+let mouseTile = 0;
 let mouseX = 0
 let mouseY = 0
 let mouseIsPressed = false
 document.addEventListener("mousedown",()=>{mouseIsPressed=true})
 document.addEventListener("mouseup",()=>{mouseIsPressed=false})
-onmousemove = (mouseData)=>{mouseX=mouseData.clientX;mouseY=mouseData.clientY}
 
-///for creating regionsc
-function createRegionsDraw(){
-    ctx.clearRect(mouseTile[0]*regionTileSize, mouseTile[1]*regionTileSize, regionTileSize, regionTileSize)
-    mouseTile = [Math.floor(mouseX/regionTileSize),Math.floor(mouseY/regionTileSize)];
-    mouseRegion = world.allTiles[mouseTile[0]+","+mouseTile[1]]
+onmousemove = (mouseData)=>{mouseX=mouseData.clientX;mouseY=mouseData.clientY},()=>{regionsDraw()}
+setInterval(()=>{regionsDraw()})
 
-    if(mouseIsPressed){
-        if(mouseRegion){
-            mouseRegion.builderClick
-        };
+function regionsDraw(){
+    if(mapViewMode == "editRegions"){
+        ctx.clearRect(mouseTile[0]*regionTileSize, mouseTile[1]*regionTileSize, regionTileSize, regionTileSize)
+        mouseTile = [Math.floor(mouseX/regionTileSize),Math.floor(mouseY/regionTileSize)];
+
+        ctx.fillStyle = "rgba(240, 240, 240, 0.5)";
+        ctx.fillRect(mouseTile[0]*regionTileSize, mouseTile[1]*regionTileSize, regionTileSize, regionTileSize);
+    }
+    else if(mapViewMode == "viewRegions"){
+
     };
-   
-    //buildRegion.draw() 
-    ctx.fillStyle = "rgba(240, 240, 240, 0.5)";
-    ctx.fillRect(mouseTile[0]*regionTileSize, mouseTile[1]*regionTileSize, regionTileSize, regionTileSize);
-    
-    if(mouseIsPressed){
-        addTileToRegion()
-    };
+    //must add the region hovering effect
 };
 
 function addTileToRegion(){
@@ -109,19 +104,19 @@ function addTileToRegion(){
     sendToServer("regionTileSet", "variableModify", [3, "arrayAdd", "regions", JSON.stringify[buildRegion], "regionTiles", [mouseTile[0]+","+mouseTile[1]]]);
 };
 
-///for viewing regions
-function viewMapDraw(){
-    mouseTile = [Math.floor(mouseX/regionTileSize),Math.floor(mouseY/regionTileSize)];
-    mouseRegion = sendToServer("mouseRegionRequest", "variableRequest", [3, "worldTiles", [mouseTile[0]+","+mouseTile[1]]]);
+// ///for viewing regions
+// function viewMapDraw(){
+//     mouseTile = [Math.floor(mouseX/regionTileSize),Math.floor(mouseY/regionTileSize)];
+//     mouseRegion = sendToServer("mouseRegionRequest", "variableRequest", [3, "worldTiles", [mouseTile[0]+","+mouseTile[1]]]);
 
-    ctx.fillStyle = mouseRegion.hovercolor
-    mouseRegion.grids.forEach((e)=>{
-        ctx.rect(e[0]*regionTileSize,e[1]*regionTileSize,regionTileSize,regionTileSize)
-    });
+//     ctx.fillStyle = mouseRegion.hovercolor
+//     mouseRegion.grids.forEach((e)=>{
+//         ctx.rect(e[0]*regionTileSize,e[1]*regionTileSize,regionTileSize,regionTileSize)
+//     });
 
-    if(mouseIsPressed){
-        if(world.regions[mouseRegion]){
-            world.regions[mouseRegion].viewerClick
-        };
-    };
-};
+//     if(mouseIsPressed){
+//         if(world.regions[mouseRegion]){
+//             world.regions[mouseRegion].viewerClick
+//         };
+//     };
+// };
