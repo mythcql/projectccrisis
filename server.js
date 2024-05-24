@@ -48,35 +48,30 @@ function receiveFromClient(packetName, packetType, packet, client){
             depth++;
         };
 
-        var variablePathPermission = SJW2[packet[1]][packet[2]]
-        console.log(packet)
-        var clientPermission = (SJW2.connectedClients[client.id]);
+        sendToSpecificClient(client.id, (packetName), JSON.stringify(variablePath));
 
-        console.log(variablePathPermission.permissions);
-        console.log(clientPermission);
-        console.log(variablePathPermission.permissions[clientPermission]);
-
-
-        if ((variablePathPermission.permissions[SJW2.connectedClients[client.id]] == 4)){
-            sendToSpecificClient(client.id, (packetName), JSON.stringify(variablePath));
-        }
-        else if((variablePathPermission.permissions[SJW2.connectedClients[client.id]] == 2)){
-            sendToSpecificClient(client.id, (packetName), "partial permission thing that hasnt been finished");
-        }
-        else if((variablePathPermission.permissions[SJW2.connectedClients[client.id]] == 0)){
-            sendToSpecificClient(client.id, (packetName), "access denied, permission not granted");
-        }
-        else{
-            console.log("no permission thingie");
-        };
+        // if ((variablePathPermission.permissions[SJW2.connectedClients[client.id]] == 4)){
+        //     sendToSpecificClient(client.id, (packetName), JSON.stringify(variablePath));
+        // }
+        // else if((variablePathPermission.permissions[SJW2.connectedClients[client.id]] == 2)){
+        //     sendToSpecificClient(client.id, (packetName), "partial permission thing that hasnt been finished");
+        // }
+        // else if((variablePathPermission.permissions[SJW2.connectedClients[client.id]] == 0)){
+        //     sendToSpecificClient(client.id, (packetName), "access denied, permission not granted");
+        // }
+        // else{
+        //     console.log("no permission thingie");
+        // };
     }
 
     if(packetType == "variableModify"){
         //packet (lengthOfPath, modificationType, path1, path2, path(length), (mods))
         var variablePath = SJW2;
         let depth = 2;
+        console.log(packet)
         while (depth < ((packet[0])+2)){
             variablePath = (variablePath[packet[depth]]);
+            console.log(variablePath)
             depth++;
         };
 
@@ -124,8 +119,8 @@ class WORLD{
         let nation = new NATION(nationID, color);
         this.nations[nationID] = nation;
     };
-    createRegion(regionID, controlScores, resourceType, isCity){
-        let region = new REGION(regionID, controlScores, resourceType, isCity);
+    createRegion(regionID, controlScores, intelScores, resourceType, isCity){
+        let region = new REGION(regionID, controlScores, intelScores, resourceType, isCity);
         this.regions[regionID] = region;
     };
 };

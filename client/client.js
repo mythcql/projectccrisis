@@ -7,9 +7,7 @@ myCanvas.style.top = 0;
 myCanvas.style.left = 0;
 myCanvas.style.zIndex = 5;
 myCanvas.width = Width;
-WidthM = Width/2;
 myCanvas.height = Height;
-HeightM = Height/2;
 myCanvas.style.position = "absolute";
 
 const socket = io.connect('/');
@@ -25,6 +23,39 @@ function recievePacket(packetName, packet){
 //////////
 
 
+class region{
+    constructor(){
+      this.grids = []
+      this.color = "red"
+      this.id = "IndoChina"
+      this.adjacentRegions = {}
+      
+      this.lastCollected = Date.now()
+      
+    }
+    
+    addSquare(x,y){
+      this.grids.push([x,y])
+      world.allTiles[x+","+y] = this.id
+    }
+    
+    draw(){
+      ctx.fillStyle = this.color
+      if(mouseRegion == this.id){ctx.fillStyle = "rgba(240, 240, 240, 0.3)"}
+      this.grids.forEach((e)=>{
+        ctx.rect(e[0]*regionTileSize,e[1]*regionTileSize,regionTileSize,regionTileSize)
+      })
+    }
+    builderClick(){
+      console.log(this.id+" was clicked")
+    }
+  }
+  
+  class world{
+    static allTiles = {};
+    static regions = {"IndoChina":new region()};
+  }
+
 
 /////Login & Permissions/////
 function login(username, password){
@@ -36,36 +67,39 @@ function login(username, password){
 
 /////
 let zoomFactor = 1;
-let regionTileSize = 30*zoomFactor;
-let mouseTile= [0,0]; //what tile the mouse is on
+let regionTileSize = 20*zoomFactor;
+let mouseTile= 0; //what tile the mouse is on
 let mouseRegion; //what region the mouse is on
-let buildRegion; //the region you are currently creating
+let buildRegion = world.regions.IndoChina
 
 let img;
-function setup() {
-  createCanvas(window.innerWidth, window.innerHeight);
-  img = createImg('https://geology.com/world/china-provinces-map.gif');
-  drawbackground()
-};
 
-function drawBackground() {
-    background(220);
-    image(img,0,0,900*scale,822*scale);
-};
+setInterval(()=>{createRegionsDraw()},10)
 
-///for creating regions
+let mouseX = 0
+let mouseY = 0
+let mouseIsPressed = false
+document.addEventListener("mousedown",()=>{mouseIsPressed=true})
+document.addEventListener("mouseup",()=>{mouseIsPressed=false})
+onmousemove = (mouseData)=>{mouseX=mouseData.clientX;mouseY=mouseData.clientY}
+
+///for creating regionsc
 function createRegionsDraw(){
+    ctx.clearRect(mouseTile[0]*regionTileSize, mouseTile[1]*regionTileSize, regionTileSize, regionTileSize)
     mouseTile = [Math.floor(mouseX/regionTileSize),Math.floor(mouseY/regionTileSize)];
+    mouseRegion = world.allTiles[mouseTile[0]+","+mouseTile[1]]
 
     if(mouseIsPressed){
         if(mouseRegion){
             mouseRegion.builderClick
         };
     };
-    currentRegion.draw()
-        fill("rgba(240, 240, 240, 0.3)")
-        rect(mouseTile[0]*sqsize,mouseTile[1]*sqsize,sqsize,sqsize)
-    if(mousedown){
+   
+    //buildRegion.draw() 
+    ctx.fillStyle = "rgba(240, 240, 240, 0.5)";
+    ctx.fillRect(mouseTile[0]*regionTileSize, mouseTile[1]*regionTileSize, regionTileSize, regionTileSize);
+    
+    if(mouseIsPressed){
         addTileToRegion()
     };
 };
@@ -80,9 +114,9 @@ function viewMapDraw(){
     mouseTile = [Math.floor(mouseX/regionTileSize),Math.floor(mouseY/regionTileSize)];
     mouseRegion = sendToServer("mouseRegionRequest", "variableRequest", [3, "worldTiles", [mouseTile[0]+","+mouseTile[1]]]);
 
-    fill(mouseRegion.hovercolor)
+    ctx.fillStyle = mouseRegion.hovercolor
     mouseRegion.grids.forEach((e)=>{
-        rect(e[0]*sqsize,e[1]*sqsize,sqsize,sqsize)
+        ctx.rect(e[0]*regionTileSize,e[1]*regionTileSize,regionTileSize,regionTileSize)
     });
 
     if(mouseIsPressed){
