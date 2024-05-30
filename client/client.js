@@ -32,7 +32,7 @@ function login(username, password){
 
 
 
-class region{
+class REGION{
     constructor(){
       this.grids = []
       this.color = "red"
@@ -43,28 +43,35 @@ class region{
       
     }
     
-    addSquare(x,y){
-      this.grids.push([x,y])
-      world.allTiles[x+","+y] = this.id
+    addSquare(mouseTile){
+      this.grids.push(mouseTile)
+      SJW2.allTiles[mouseTile] = this.id
     }
     
     draw(){
-      ctx.fillStyle = this.color
-      if(mouseRegion == this.id){ctx.fillStyle = "rgba(240, 240, 240, 0.3)"}
+      ctx.fillStyle = "rgba(240, 100, 100, 1)"
       this.grids.forEach((e)=>{
-        ctx.rect(e[0]*regionTileSize,e[1]*regionTileSize,regionTileSize,regionTileSize)
-      })
+        ctx.fillRect(e[0]*regionTileSize,e[1]*regionTileSize,regionTileSize,regionTileSize)})
     }
     builderClick(){
       console.log(this.id+" was clicked")
     }
   }
   
-  class world{
-    static allTiles = {};
-    static regions = {"IndoChina":new region()};
+  class WORLD{
+    constructor(){
+    this.allTiles = {};
+    this.regions = {}
+    };
+
+    createRegion(){
+      let region = new REGION();
+      this.regions["IndoChina"] = region;
+  };
   }
 
+  SJW2 = new WORLD()
+  SJW2.createRegion()
 
 
 
@@ -72,7 +79,7 @@ class region{
 /////
 let mapViewMode = "editRegions"
 
-
+let buildRegion = "IndoChina"
 let zoomFactor = 1;
 let regionTileSize = 20*zoomFactor;
 let mouseTile = 0;
@@ -87,11 +94,16 @@ setInterval(()=>{regionsDraw()})
 
 function regionsDraw(){
     if(mapViewMode == "editRegions"){
-        ctx.clearRect(mouseTile[0]*regionTileSize, mouseTile[1]*regionTileSize, regionTileSize, regionTileSize)
-        mouseTile = [Math.floor(mouseX/regionTileSize),Math.floor(mouseY/regionTileSize)];
+        resetRect(mouseTile[0]*regionTileSize, mouseTile[1]*regionTileSize, regionTileSize, regionTileSize)
+        mouseTile = [Math.floor(mouseX/regionTileSize), Math.floor(mouseY/regionTileSize)];
 
         ctx.fillStyle = "rgba(240, 240, 240, 0.5)";
         ctx.fillRect(mouseTile[0]*regionTileSize, mouseTile[1]*regionTileSize, regionTileSize, regionTileSize);
+
+        if(mouseIsPressed == true){
+          SJW2.regions[buildRegion].addSquare(mouseTile);
+          renderWorld();
+      };
     }
     else if(mapViewMode == "viewRegions"){
 
@@ -99,24 +111,20 @@ function regionsDraw(){
     //must add the region hovering effect
 };
 
+
+function resetRect(co1, co2, co3, co4){
+    ctx.clearRect(co1, co2, co3, co4)
+    if(SJW2.allTiles[mouseTile]){
+    ctx.fillStyle = "rgba(240, 100, 100, 1)"
+    ctx.fillRect(co1, co2, co3, co4)
+    };
+};
+
 function addTileToRegion(){
     sendToServer("worldTileRegionSet", "variableModify", [1, "dictChange", "worldTiles", [[mouseTile[0]+","+mouseTile[1]], buildRegion]]);
     sendToServer("regionTileSet", "variableModify", [3, "arrayAdd", "regions", JSON.stringify[buildRegion], "regionTiles", [mouseTile[0]+","+mouseTile[1]]]);
 };
 
-// ///for viewing regions
-// function viewMapDraw(){
-//     mouseTile = [Math.floor(mouseX/regionTileSize),Math.floor(mouseY/regionTileSize)];
-//     mouseRegion = sendToServer("mouseRegionRequest", "variableRequest", [3, "worldTiles", [mouseTile[0]+","+mouseTile[1]]]);
-
-//     ctx.fillStyle = mouseRegion.hovercolor
-//     mouseRegion.grids.forEach((e)=>{
-//         ctx.rect(e[0]*regionTileSize,e[1]*regionTileSize,regionTileSize,regionTileSize)
-//     });
-
-//     if(mouseIsPressed){
-//         if(world.regions[mouseRegion]){
-//             world.regions[mouseRegion].viewerClick
-//         };
-//     };
-// };
+function renderWorld(){
+    SJW2.regions.IndoChina.draw()
+};
