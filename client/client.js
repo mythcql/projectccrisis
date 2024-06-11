@@ -82,7 +82,7 @@ let mapViewMode = "editRegions"
 let buildRegion = "IndoChina"
 let zoomFactor = 1;
 let regionTileSize = 20*zoomFactor;
-let mouseTile = 0;
+let mouseTile = [0,0];
 let mouseX = 0
 let mouseY = 0
 let mouseIsPressed = false
@@ -106,7 +106,15 @@ function regionsDraw(){
       };
     }
     else if(mapViewMode == "viewRegions"){
+      resetRect(mouseTile[0]*regionTileSize, mouseTile[1]*regionTileSize, regionTileSize, regionTileSize)
+      mouseTile = [Math.floor(mouseX/regionTileSize), Math.floor(mouseY/regionTileSize)];
 
+      ctx.fillStyle = "rgba(240, 240, 240, 0.5)";
+      ctx.fillRect(mouseTile[0]*regionTileSize, mouseTile[1]*regionTileSize, regionTileSize, regionTileSize);
+      
+      if(mouseIsPressed == true){
+        console.log(SJW2.allTiles[mouseTile])
+      };
     };
     //must add the region hovering effect
 };
@@ -115,8 +123,8 @@ function regionsDraw(){
 function resetRect(co1, co2, co3, co4){
     ctx.clearRect(co1, co2, co3, co4)
     if(SJW2.allTiles[mouseTile]){
-    ctx.fillStyle = "rgba(240, 100, 100, 1)"
-    ctx.fillRect(co1, co2, co3, co4)
+        ctx.fillStyle = "rgba(240, 100, 100, 1)"
+        ctx.fillRect(co1, co2, co3, co4)
     };
 };
 
