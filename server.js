@@ -34,6 +34,8 @@ function receiveFromClient(packetName, packetType, packet, client) {
         if (SJW2.validLogins[(packet[0]+ ", " + packet[1])]) {
             SJW2.connectedClients[client.id] = SJW2.validLogins[(packet[0] + ", " + packet[1])];
             console.log(client.id + " Login Success, New Permission Level: " + SJW2.connectedClients[client.id]);
+            
+            updateClientData(client.id)
         }
         else{
             console.log("invalid login");
@@ -92,6 +94,69 @@ function receiveFromClient(packetName, packetType, packet, client) {
 function sendToSpecificClient(clientID, packetName, packet) {
     io.to(clientID).emit(packetName, packet);
 };
+
+function updateClientData(clientID){
+    let gameState = JSON.parse(JSON.stringify(SJW2))
+
+
+    sendToSpecificClient(clientID, "currentGameState", parsedGameState)
+};
+//////////
+
+
+
+/////Permission Manager/////
+function verifyPermissions(clientID, encodedVariablePath){
+    let permissionLevel = SJW2.connectedClients[clientID]
+    var CBPermissionLevel;
+    if (permissionLevel[0] == 0){
+        CBPermissionLevel = permissionLevel[0]
+    }
+    else if (permissionLevel[0] == 1){
+        CBPermissionLevel = permissionLevel[0]
+    }
+    else if (permissionLevel[0] == 2){
+        if (encodedVariablePath[0] == "nations"){
+            if (encodedVariablePath[1] == permissionLevel[1]){
+                CBPermissionLevel = permissionLevel[3]
+            }
+            else{CBPermissionLevel = permissionLevel[0]};
+        }
+        else if (encodedVariablePath[0] == "regions"){
+            if (SJW2.regions[encodedVariablePath[1]].controlScores[permissionLevel[1]] == 5 || SJW2.regions[encodedVariablePath[1]].controlScores[permissionLevel[1]] == 4 || SJW2.regions[encodedVariablePath[1]].controlScores[permissionLevel[1]] == 3){
+                CBPermissionLevel = permissionLevel[2]
+                console.log(CBPermissionLevel)
+            }
+            else{CBPermissionLevel = permissionLevel[0]};
+        }
+        else if (encodedVariablePath[0]){
+
+        }
+        else{
+
+        }
+    }
+    else if (permissionLevel[0] == 3){
+        if (encodedVariablePath[0] == "nations"){
+            
+        }
+        else if (encodedVariablePath[0] == "regions"){
+
+        }
+        else if (encodedVariablePath[0]){
+
+        }
+        else{
+
+        }
+    }
+    else if (permissionLevel[0]){
+
+    }
+    else{
+
+    }
+};
 //////////
 
 
@@ -147,10 +212,10 @@ class NATION{
         this.colorCtrl4 = pSBC(0.3, this.colorCtrl5); 
         this.colorCtrl6 = pSBC(-0.3, this.colorCtrl5);
         this.units = {};
-        this.permissions = {["admin"]:4, ["overlord"]:4, ["director" + ", " + nationID]:4, ["director"]:3, ["chair" + ", " + nationID]:3, ["spectator" + ", " + nationID]:3, ["chair"]:1, ["spectator"]:1, ["noLogin"]:0};
+        this.permissions = {};
     };
 
-    createUnit(type, level, location) {
+    createUnit(type, level, location){
         let unit = new UNIT(this.nationID, type, level, location);
         this.units[unitID] = unit;
     };
@@ -211,14 +276,14 @@ const pSBC=(p,c0,c1,l)=>{
 
 /////Temp Save///// 
 let SJW2 = new WORLD("HJCC2ndSinoJapWarV1.json", {
-    "admin, adminPassTemp":"admin",
-    "overlord, overlordPassTemp":"overlord",
-    "chineseDirector, chinaDirPassTemp":("director", "China"), 
-    "japaneseDirector, japanDirPassTemp":("director", "Japan"), 
-    "chineseChair, chinaChaPassTemp":("chair", "China"), 
-    "japaneseChair, japanChaPassTemp":("chair", "Japan"), 
-    "chinaSpectator, chinaSpecPassTemp":("spectator", "China"), 
-    "japanSpectator, japanSpecPassTemp":("spectator", "Japan")
+    "admin, adminPassTemp":(0),
+    "overlord, overlordPassTemp":(1),
+    "chineseDirector, chinaDirPassTemp":(2, "China", 1),
+    "japaneseDirector, japanDirPassTemp":(2, "Japan", 1),
+    "chineseChair, chinaChaPassTemp":(3, "China", 2),
+    "japaneseChair, japanChaPassTemp":(3, "Japan", 2),
+    "chinaPlayer, chinaPlayPassTemp":(3, "China", 2, "positionChina", 1),
+    "japanPlayer, japanPlayPassTemp":(3, "Japan", 2, "positionJapan", 1)
     }
 );
 

@@ -18,7 +18,10 @@ function sendToServer(packetName, packetType, packet){
 }
 
 function recievePacket(packetName, packet){
-    console.log("Recieved packet named: " + packetName + ", Containing: " + packet)
+  if(packetName == "gameLoadInfo"){
+    
+  };
+  console.log("Recieved packet named: " + packetName + ", Containing: " + packet)
 }
 //////////
 
@@ -32,60 +35,74 @@ function login(username, password){
 
 
 
-class REGION{
-    constructor(){
-      this.grids = []
-      this.color = "red"
-      this.id = "IndoChina"
-      this.adjacentRegions = {}
-      
-      this.lastCollected = Date.now()
-      
-    }
-    
-    addSquare(mouseTile){
-      this.grids.push(mouseTile)
-      SJW2.allTiles[mouseTile] = this.id
-    }
-    
-    draw(){
-      ctx.fillStyle = "rgba(240, 100, 100, 1)"
-      this.grids.forEach((e)=>{
-        ctx.fillRect(e[0]*regionTileSize,e[1]*regionTileSize,regionTileSize,regionTileSize)})
-    }
-    builderClick(){
-      console.log(this.id+" was clicked")
-    }
-  }
-  
-  class WORLD{
-    constructor(){
-    this.allTiles = {};
-    this.regions = {}
-    };
-
-    createRegion(){
-      let region = new REGION();
-      this.regions["IndoChina"] = region;
+/////Basic Variable Structure/////
+class WORLD{
+  constructor() {
+      this.worldID = 0o0;
+      this.nations = {};
+      this.regions = {};
+      this.idToName = {};
+      this.worldTiles = {};
   };
-  }
+};
 
-  SJW2 = new WORLD()
-  SJW2.createRegion()
+class REGION{
+  constructor(regionID, controlScores, intelScores, resourceType, isCity) {
+      this.regionID = regionID;
+      this.controlScores = controlScores;
+      this.intelScores = intelScores;
+      this.resourceType = resourceType;
+      this.isCity = isCity;
+      this.regionTiles = [];
+      this.occupingUnits = [];
+      this.adjacentRegions = [];
+  };
 
+  addSquare(mouseTile){
+    this.regionTiles.push(mouseTile);
+    SJW2.worldTiles[mouseTile] = this.regionID;
+  };
+  
+  draw(){
+    ctx.fillStyle = "rgba(240, 100, 100, 1)"
+    this.regionTiles.forEach((e)=>{
+      ctx.fillRect(e[0]*regionTileSize,e[1]*regionTileSize,regionTileSize,regionTileSize)})
+  };
+};
+
+
+class NATION{
+  constructor(nationID, color) {
+      this.nationID = nationID;
+      this.colorCtrl5 = color;
+      this.colorCtrl4 = pSBC(0.3, this.colorCtrl5); 
+      this.colorCtrl6 = pSBC(-0.3, this.colorCtrl5);
+      this.units = {};
+  };
+};
+
+class UNIT{
+  constructor(unitID, owner, type, level, location) {
+      this.unitID = unitID;
+      this.owner = owner; 
+      this.type = type;
+      this.level = level;
+      this.location = location;
+  };
+};
+//////////
 
 
 
 /////
 let mapViewMode = "editRegions"
-
 let buildRegion = "IndoChina"
 let zoomFactor = 1;
 let regionTileSize = 20*zoomFactor;
 let mouseTile = [0,0];
-let mouseX = 0
-let mouseY = 0
-let mouseIsPressed = false
+let mouseX = 0;
+let mouseY = 0;
+let mouseIsPressed = false;
 document.addEventListener("mousedown",()=>{mouseIsPressed=true})
 document.addEventListener("mouseup",()=>{mouseIsPressed=false})
 
@@ -113,7 +130,7 @@ function regionsDraw(){
       ctx.fillRect(mouseTile[0]*regionTileSize, mouseTile[1]*regionTileSize, regionTileSize, regionTileSize);
       
       if(mouseIsPressed == true){
-        console.log(SJW2.allTiles[mouseTile])
+        console.log(SJW2.worldTiles[mouseTile])
       };
     };
     //must add the region hovering effect
@@ -122,7 +139,7 @@ function regionsDraw(){
 
 function resetRect(co1, co2, co3, co4){
     ctx.clearRect(co1, co2, co3, co4)
-    if(SJW2.allTiles[mouseTile]){
+    if(SJW2.worldTiles[mouseTile]){
         ctx.fillStyle = "rgba(240, 100, 100, 1)"
         ctx.fillRect(co1, co2, co3, co4)
     };
