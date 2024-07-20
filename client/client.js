@@ -41,7 +41,6 @@ class WORLD{
       this.worldID = 0o0;
       this.nations = {};
       this.regions = {};
-      this.idToName = {};
       this.worldTiles = {};
   };
 };

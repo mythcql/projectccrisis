@@ -98,6 +98,7 @@ function sendToSpecificClient(clientID, packetName, packet) {
 function updateClientData(clientID){
     let gameState = JSON.parse(JSON.stringify(SJW2))
 
+    console.log(gameState)
 
     sendToSpecificClient(clientID, "currentGameState", parsedGameState)
 };
@@ -129,33 +130,29 @@ function verifyPermissions(clientID, encodedVariablePath){
             }
             else{CBPermissionLevel = permissionLevel[0]};
         }
-        else if (encodedVariablePath[0]){
-
-        }
         else{
-
+            CBPermissionLevel = permissionLevel[0]
         }
     }
     else if (permissionLevel[0] == 3){
         if (encodedVariablePath[0] == "nations"){
-            
+            if (encodedVariablePath[1] == permissionLevel[1]){
+                CBPermissionLevel = permissionLevel[3]
+            }
+            else{CBPermissionLevel = permissionLevel[0]};
         }
         else if (encodedVariablePath[0] == "regions"){
-
-        }
-        else if (encodedVariablePath[0]){
-
+            if (SJW2.regions[encodedVariablePath[1]].controlScores[permissionLevel[1]] == 5 || SJW2.regions[encodedVariablePath[1]].controlScores[permissionLevel[1]] == 4 || SJW2.regions[encodedVariablePath[1]].controlScores[permissionLevel[1]] == 3){
+                CBPermissionLevel = permissionLevel[2]
+                console.log(CBPermissionLevel)
+            }
+            else{CBPermissionLevel = permissionLevel[0]};
         }
         else{
-
-        }
-    }
-    else if (permissionLevel[0]){
-
-    }
-    else{
-
-    }
+            CBPermissionLevel = permissionLevel[0]
+        };
+    };
+    return CBPermissionLevel
 };
 //////////
 
@@ -170,7 +167,6 @@ class WORLD{
         this.worldID = 0o0;
         this.nations = {};
         this.regions = {};
-        this.idToName = {};
         this.worldTiles = {};
         this.validLogins = loginInfo;
         this.connectedClients = {};
